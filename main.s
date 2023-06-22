@@ -11,6 +11,10 @@
 .segment "BANK_003"
 .include "startup.s"
 
+.proc SysReset
+	
+.endproc
+
 .proc Main
 	; Clear sprite data
 	lda #$ff
@@ -40,6 +44,28 @@
 			inx
 			cpx Temp
 			bne :-
+		:
+
+		; Frame counter
+		ldx SixtyFrameCounter
+		inx
+		stx SixtyFrameCounter
+		cpx #60
+		bne :+
+		ldx #0
+		stx SixtyFrameCounter
+		lda #1
+		ora AllowSystemResetFlag
+		sta AllowSystemResetFlag
+		:
+
+		; System reset
+		lda AllowSystemResetFlag
+		bne :+
+		lda KeyboardInputs
+		and KeyBits_Stop
+		beq :+
+		jmp SysReset
 		:
 
 

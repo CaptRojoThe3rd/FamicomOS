@@ -258,6 +258,9 @@ KeyboardInputsOld				= $2c ; 9 bytes, $2c-$34
 KeyboardInputs					= $35 ; 9 bytes, $35-$3d
 KeyboardInputsNew				= $3e ; 9 bytes, $3e-$46
 
+SixtyFrameCounter				= $3f
+AllowSystemResetFlag			= $40
+
 SpriteData						= $200 ; 256 bytes, $200-$2ff
 
 
