@@ -263,6 +263,9 @@ AllowSystemResetFlag			= $40
 
 SpriteData						= $200 ; 256 bytes, $200-$2ff
 
+Palette							= $300 ; 32 bytes, $300-$31f
+
 
 ; SRAM 0
-FileSystemData					= $6000 ; 1024 bytes, $6000-$63ff
+SystemSettings					= $6000 ; 256 bytes, $6000-$60ff
+FileSystemData					= $6100 ; 768 bytes, $6100-$63ff

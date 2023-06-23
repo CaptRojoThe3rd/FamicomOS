@@ -7,6 +7,24 @@
 	tya
 	pha
 
+	; IRQ
+	lda #216
+	sta IRQScanline_5203
+	lda #$80
+	sta ScanlineIRQStatus_5204
+
+	; Palette
+	ldx #$3f
+	stx PpuAddr_2006
+	ldx #$00
+	stx PpuAddr_2006
+	:
+		lda Palette,x
+		sta PpuData_2007
+		inx
+		cpx #32
+		bne :-
+
 	; Sprite DMA Transfer
 	lda #$00
 	sta OamAddr_2003

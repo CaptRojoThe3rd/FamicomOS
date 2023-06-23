@@ -9,11 +9,50 @@
 .include "nmi.s"
 
 .segment "BANK_003"
-.include "startup.s"
 
 .proc SysReset
-	
+	ldx #0
+	stx CurrentBank6000
+	stx Prg6000_5113
+	txa
+	:
+		sta $6000,x
+		sta $6100,x
+		sta $6200,x
+		sta $6300,x
+		sta $6400,x
+		sta $6500,x
+		sta $6600,x
+		sta $6700,x
+		sta $6800,x
+		sta $6900,x
+		sta $6a00,x
+		sta $6b00,x
+		sta $6c00,x
+		sta $6d00,x
+		sta $6e00,x
+		sta $6f00,x
+		sta $7000,x
+		sta $7100,x
+		sta $7200,x
+		sta $7300,x
+		sta $7400,x
+		sta $7500,x
+		sta $7600,x
+		sta $7700,x
+		sta $7800,x
+		sta $7900,x
+		sta $7a00,x
+		sta $7b00,x
+		sta $7c00,x
+		sta $7d00,x
+		sta $7e00,x
+		sta $7f00,x
+		inx
+		bne :-
 .endproc
+
+.include "startup.s"
 
 .proc Main
 	; Clear sprite data
