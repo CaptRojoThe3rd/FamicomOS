@@ -8,7 +8,7 @@
 	pha
 
 	; IRQ
-	lda #216
+	lda #224
 	sta IRQScanline_5203
 	lda #$80
 	sta ScanlineIRQStatus_5204
