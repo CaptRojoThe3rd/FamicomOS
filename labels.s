@@ -1,3 +1,12 @@
+.define Button_A #$80
+.define Button_B #$40
+.define Button_Select #$20
+.define Button_Start #$10
+.define DPad_Up #$8
+.define DPad_Down #$4
+.define DPad_Left #$2
+.define DPad_Right #$1
+
 .define KeyBits_Stop			#$80
 .define KeyBits_Yen				#$40
 .define KeyBits_RShift			#$20
@@ -258,14 +267,41 @@ KeyboardInputsOld				= $2c ; 9 bytes, $2c-$34
 KeyboardInputs					= $35 ; 9 bytes, $35-$3d
 KeyboardInputsNew				= $3e ; 9 bytes, $3e-$46
 
-SixtyFrameCounter				= $3f
-AllowSystemResetFlag			= $40
+Controller1InputsOld			= $47
+Controller1Inputs				= $48
+Controller1InputsNew			= $49
+
+Controller2InputsOld			= $4a
+Controller2Inputs				= $4b
+Controller2InputsNew			= $4c
+
+SixtyFrameCounter				= $4d
+AllowSystemResetFlag			= $4e
+
+DisableInput					= $4f
+
+PPUSingleTileIndex				= $50
+TilesUpdated					= $51
+
+DataRecorderAnimationFrame		= $52
+
+Palette							= $100 ; 32 bytes, $100-$11f
+
+PPUSingleTileData				= $120 ; 16 bytes, $120-$12f
+PPUSingleTileAddrHi				= $130 ; 16 bytes, $130-$13f
+PPUSingleTileAddrLo				= $140 ; 16 bytes, $140-$14f
 
 SpriteData						= $200 ; 256 bytes, $200-$2ff
-
-Palette							= $300 ; 32 bytes, $300-$31f
 
 
 ; SRAM 0
 SystemSettings					= $6000 ; 256 bytes, $6000-$60ff
+
+SystemSettings_Appearance		= SystemSettings
+; Appearance Settings
+;   SBBBCCCC
+;   ||||++++-- Cursor
+;   |+++------ Background
+;   +--------- Start Menu Icon    
+
 FileSystemData					= $6100 ; 768 bytes, $6100-$63ff

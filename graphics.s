@@ -1,5 +1,24 @@
 .segment "BANK_003"
 
+.proc ClearSpriteDataWithIndex
+	lda SpriteIndex
+	beq :++
+	sta Temp
+	ldx #0
+	stx SpriteIndex
+	lda #$ff
+	:
+		sta SpriteData,x
+		inx
+		inx
+		inx
+		inx
+		cpx Temp
+		bne :-
+	:
+	rts
+.endproc
+
 .proc AddBufferToSpriteData
 	ldx SpriteIndex
 	lda SpriteBuffer

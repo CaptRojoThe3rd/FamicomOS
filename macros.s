@@ -2,7 +2,7 @@
 	lda #%00011110
 	sta PpuMask_2001
 	sta PpuMask_Copy
-	lda #%10000000
+	lda #%10100000
 	sta PpuControl_2000
 	sta PpuControl_Copy
 .endmacro
@@ -11,7 +11,7 @@
 	lda #%00000000
 	sta PpuControl_2000
 	sta PpuControl_Copy
-	;lda #%00000000
+	lda #%00100000
 	sta PpuMask_Copy
 	sta PpuMask_2001
 .endmacro

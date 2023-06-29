@@ -22,6 +22,9 @@
 		inx
 		bne :-
 
+	sta PpuControl_2000
+	sta PpuMask_2001
+
 	ldx #$20
 	stx PpuAddr_2006
 	ldx #$00
@@ -50,7 +53,6 @@
 		; PRG and CHR modes
 		lda #$03
 		sta PRGMode_5100
-		sta CHRMode_5101
 
 		; Enable PRG-RAM
 		lda #$02
@@ -89,6 +91,8 @@
 		sta PrgC000_5116
 		sta CurrentBankC000
 
+		lda #0
+		sta CHRMode_5101
 		; These registers are ignored in extended attribute mode
 		;ldx #0
 		;stx ChrUpperBits_5130
