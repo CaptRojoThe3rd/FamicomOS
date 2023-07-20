@@ -13,34 +13,39 @@
 	ldy #$00
 	lda #$3f
 
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
-	nop
+	jsr Wait50Cycles
 	
 	sty PpuMask_2001
 	sta PpuAddr_2006
 	sty PpuAddr_2006
 	stx PpuData_2007
-
-	lda #$1f
 	sta PpuAddr_2006
-	lda #$80
+	ldy #13
+	sty PpuAddr_2006
+
+	jsr Wait50Cycles
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+	nop
+
+	lda #$2f
+	sta PpuAddr_2006
+	lda #$60
 	sta PpuAddr_2006
 
 	lda PpuMask_Copy
@@ -103,12 +108,13 @@
 	stx PPUSingleTileData+3
 	ldx #4
 	stx PPUSingleTileIndex
-	asl TilesUpdated
+	lda #2
+	sta TilesUpdated
 	:
 	bit DisableInput
 	bpl :+
 	jsr ClearSpriteDataWithIndex
-	lda #236
+	lda #234
 	sta SpriteBuffer
 	lda #$ed
 	sta SpriteBuffer+1
@@ -117,13 +123,13 @@
 	lda #186
 	sta SpriteBuffer+3
 	jsr AddBufferToSpriteData
-	lda #224
+	lda #222
 	sta SpriteBuffer
 	lda DataRecorderAnimationFrame
 	asl
 	adc #$ef
 	sta SpriteBuffer+1
-	lda #$21
+	lda #$20
 	sta SpriteBuffer+2
 	lda #184
 	sta SpriteBuffer+3
@@ -149,9 +155,8 @@
 	tay
 	pla
 	tax
-	pla
+	pla	
 	rti
-
 	:
 		bit DisableInput
 		bvc :+

@@ -9,18 +9,49 @@
 .include "irq.s"
 .include "nmi.s"
 
+.include "filesystem.s"
+
+.include "desktop.s"
+
 .segment "BANK_003"
 
 DefaultPalette:
-	.byte $00, $2d, $10, $30
+	.byte $1b, $2d, $10, $30
 	.byte $1b, $06, $10, $00
 	.byte $1b, $11, $37, $00
-	.byte $00, $00, $00, $00
+	.byte $1b, $00, $00, $00
 
-	.byte $00, $26, $30, $10
-	.byte $00, $06, $10, $2d
-	.byte $00, $00, $00, $00
-	.byte $00, $00, $00, $00
+	.byte $1b, $26, $30, $10
+	.byte $1b, $06, $10, $2d
+	.byte $1b, $00, $10, $30
+	.byte $1b, $00, $00, $00
+
+MouseCursorPalettes:
+	.byte $1b, $2d, $10, $30
+	.byte $1b, $16, $18, $27
+	.byte $1b, $18, $36, $2a
+	.byte $1b, $27, $02, $10
+	.byte $1b, $2d, $10, $30
+	.byte $1b, $00, $00, $00
+	.byte $1b, $00, $00, $00
+	.byte $1b, $00, $00, $00
+	.byte $1b, $00, $00, $00
+	.byte $1b, $30, $00, $0f
+	.byte $1b, $35, $25, $0f
+	.byte $1b, $16, $06, $27
+	.byte $1b, $11, $06, $2c
+	.byte $1b, $00, $0f, $30
+	.byte $1b, $11, $06, $2c
+	.byte $1b, $00, $0f, $30
+
+DesktopBackgroundPalettes:
+	.byte $29, $19, $2c, $30
+	.byte $17, $08, $2c, $21
+	.byte $30, $0f, $26, $00
+	.byte $11, $0f, $30, $1a
+	.byte $30, $00, $0f, $10
+	.byte $09, $00, $19, $10
+	
 
 KeyboardInfoSprites:
 	.byte 227, $fd, 0, 244 ; Stop
@@ -148,6 +179,41 @@ ControllerInfoSprites:
 		bne :-
 .endproc
 
+.proc DynamicJump
+	tax
+
+	pla
+	sta Temp
+	pla
+	sta Temp+1
+
+	inc Temp
+	ldy #0
+	lda (Temp),y
+	asl
+	adc Temp
+	sta Temp+4
+	lda Temp+1
+	adc #0
+	pha
+	lda Temp+4
+	pha
+
+	txa
+	asl
+	inc Temp
+
+	tay
+
+	lda (Temp),y
+	sta Temp+2
+	iny
+	lda (Temp),y
+	sta Temp+3
+
+	jmp (Temp+2)
+.endproc
+
 .include "startup.s"
 
 .proc Main
@@ -163,9 +229,103 @@ ControllerInfoSprites:
 		bne :-
 
 	; Draw screen
+	lda #$20
+	sta PpuAddr_2006
+	ldx #0
+	stx PpuAddr_2006
+	ldy #4
+	lda #1
+	:
+		sta PpuData_2007
+		inx
+		bne :-
+		dey
+		bne :-
 	lda #%10
 	sta RAMMode_5104
+
+	; Desktop background
+	lda #$2c
+	sta PpuAddr_2006
+	ldy #$00
+	sty PpuAddr_2006
+	lda #$5c
+	sta Temp+1
+	sty Temp
+	sty Temp+2
+	sty Prg6000_5113
+	lda SystemSettings_Appearance
+	and #$70
+	cmp #$70
+	beq @DesktopSolidColor
+	lsr
+	lsr
+	sta Temp
+	sta Temp+3
+	ldx #0
+	:
+		txa
+		sta PpuData_2007
+		inx
+		cpx #$80
+		beq :+
+		cpx #$00
+		bne :-
+		inc Temp+2
+		bne :-
+		:
+		ldy Temp+2
+		cpy #$03
+		bne :--
+	ldx #0
+	clc
+	:
+		lda #$c4
+		adc Temp
+		sta $5c00,x
+		lda #$c5
+		adc Temp
+		sta $5d00,x
+		lda #$c7
+		adc Temp
+		sta $5e80,x
+		lda #$c6
+		adc Temp
+		sta $5e00,x
+		inx
+		bne :-
+	beq :+++
+	@DesktopSolidColor:
+	lda #$01
+	ldy #$03
+	:
+		sta PpuData_2007
+		inx
+		cpx #$80
+		beq :+
+		cpx #$00
+		bne :-
+		inc Temp+2
+		bne :-
+		:
+		ldy Temp+2
+		cpy #$03
+		bne :--
+	:
+	lda #56
+	sta SwitchingApps
+
 	; Taskbar
+	lda #$23
+	sta PpuAddr_2006
+	lda #$80
+	sta PpuAddr_2006
+	ldx #64
+	lda #0
+	:
+		sta PpuData_2007
+		dex
+		bne :-
 	; Start menu
 	lda #$2f
 	sta PpuAddr_2006
@@ -348,7 +508,6 @@ ControllerInfoSprites:
 	; Re-enable extended attributes
 	lda #%01
 	sta RAMMode_5104
-	
 
 	; Palette
 	ldx #0
@@ -364,6 +523,27 @@ ControllerInfoSprites:
 	lda #$0f
 	sta Palette+5
 	:
+	lda SystemSettings_Appearance
+	and #$70
+	cmp #$70
+	beq :++
+	ldx Temp+3
+	ldy #0
+	:
+		lda DesktopBackgroundPalettes,x
+		sta Palette+12,y
+		inx
+		iny
+		cpy #4
+		bne :-
+	beq :++
+	:
+	lda SystemSettings_WallpaperColor
+	sta Palette+12
+	:
+
+	lda Palette+12
+	sta Palette+16
 
 	PPUOn
 
@@ -405,7 +585,91 @@ ControllerInfoSprites:
 		jmp ($fffc)
 		:
 
+		; Mouse Cursor
+		lda Controller1Inputs
+		and #$0f
+		beq :++++
+		tax
+		lda #1
+		ora MouseCursorMode
+		sta MouseCursorMode
+		txa
+		and DPad_Left
+		beq :+
+		dec MouseCursorX
+		:
+		txa
+		and DPad_Up
+		beq :+
+		dec MouseCursorY
+		:
+		txa
+		and DPad_Right
+		beq :+
+		inc MouseCursorX
+		:
+		txa
+		and DPad_Down
+		beq :+
+		inc MouseCursorY
+		:
+		lda MouseCursorX
+		cmp #0
+		bne :+
+		lda #1
+		sta MouseCursorX
+		:
+		cmp #255
+		bne :+
+		lda #254
+		sta MouseCursorX
+		:
+		lda MouseCursorY
+		cmp #239
+		bne :+
+		lda #238
+		sta MouseCursorY
+		:
+		cmp #255
+		bne :+
+		lda #0
+		sta MouseCursorY
+		:
+		lda MouseCursorMode
+		and #1
+		beq :++
+		lda MouseCursorY
+		sta SpriteBuffer
+		lda #$00
+		sta Prg6000_5113
+		lda SystemSettings_Appearance
+		and #$0f
+		asl
+		adc #$01
+		sta SpriteBuffer+1
+		lda #$02
+		sta SpriteBuffer+2
+		lda MouseCursorX
+		sta SpriteBuffer+3
+		jsr AddBufferToSpriteData
+		lda SystemSettings_Appearance
+		and #$0f
+		asl
+		asl
+		tax
+		ldy #0
+		:
+			lda MouseCursorPalettes,x
+			sta Palette+24,y
+			inx
+			iny
+			cpy #4
+			bne :-
+		:
+
 		; Keyboard info
+		lda KeysPressed
+		beq :+++++
 		lda #<KeyboardInfoSprites
 		sta Temp
 		lda #>KeyboardInfoSprites
@@ -467,7 +731,7 @@ ControllerInfoSprites:
 		jsr AddBufferToSpriteData
 		:
 
-		; Controller input
+		; Controller info
 		lda #$80
 		sta Temp
 		ldx #0
@@ -515,7 +779,42 @@ ControllerInfoSprites:
 			bne @1
 		:
 
+		; Switch apps if an icon is clicked
+		lda SwitchingApps
+		bne @DontSwitchApps
+		lda Controller1InputsNew
+		and Button_A
+		beq @DontSwitchApps
+		lda MouseCursorY
+		cmp #223
+		bcc @DontSwitchApps
+		lda MouseCursorX
+		lsr
+		lsr
+		lsr
+		lsr
+		cmp #5
+		bcs @DontSwitchApps
+		sta SelectedApp
+		lda #56
+		sta SwitchingApps
+		@DontSwitchApps:
 
+		; Update apps
+		lda SwitchingApps
+		beq :+
+		lda SelectedApp
+		jsr DynamicJump
+			.byte 1
+			.word Desktop::SwitchTo
+		dec SwitchingApps
+		bpl :++
+		:
+		lda SelectedApp
+		jsr DynamicJump
+			.byte 1
+			.word Desktop::Update
+		:
 
 		bit PpuStatus_2002
 

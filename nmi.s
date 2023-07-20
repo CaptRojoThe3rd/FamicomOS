@@ -32,7 +32,7 @@
 	pha
 
 	; IRQ
-	lda #224
+	lda #216
 	sta IRQScanline_5203
 	lda #$80
 	sta ScanlineIRQStatus_5204
@@ -60,6 +60,7 @@
 		sta PpuAddr_2006
 		lda PPUSingleTileData,x
 		sta PpuData_2007
+		lda #0
 		inx
 		cpx PPUSingleTileIndex
 		bne :-
@@ -85,8 +86,10 @@
 	; Read keyboard and controller inputs
 	lda DisableInput
 	beq :+
-	jmp :++++++
+	jmp :+++++++
 	:
+	lda #0
+	sta KeysPressed
 	ldx #8
 	:
 		lda KeyboardInputs,x
@@ -121,9 +124,12 @@
 		eor #$f0
 		ora KeyboardInputs,x
 		sta KeyboardInputs,x
+		beq :+
+		inc KeysPressed
+		:
 		inx
 		cpx #9
-		bne :-
+		bne :--
 	ldx #1
 	stx Ctrl1_4016
 	dex

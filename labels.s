@@ -285,6 +285,19 @@ TilesUpdated					= $51
 
 DataRecorderAnimationFrame		= $52
 
+MouseCursorX					= $53
+MouseCursorY					= $54
+MouseCursorMode					= $55
+
+KeysPressed						= $56
+
+SelectedApp						= $57
+SwitchingApps					= $58
+
+KeyboardSelectedOption			= $59
+
+SelectedAppSection				= $5a
+
 Palette							= $100 ; 32 bytes, $100-$11f
 
 PPUSingleTileData				= $120 ; 16 bytes, $120-$12f
@@ -302,6 +315,8 @@ SystemSettings_Appearance		= SystemSettings
 ;   SBBBCCCC
 ;   ||||++++-- Cursor
 ;   |+++------ Background
-;   +--------- Start Menu Icon    
+;   +--------- Start Menu Icon
 
-FileSystemData					= $6100 ; 768 bytes, $6100-$63ff
+SystemSettings_WallpaperColor	= SystemSettings+1
+
+FileSystemData					= $6100 ; 1792 bytes, $6100-$67ff
